@@ -5,8 +5,10 @@ import { ConfigModule } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { EnvironmentVariables } from './env.validation';
-import { WinstonModule } from 'nest-winston';
+import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import * as winston from 'winston';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -27,10 +29,26 @@ import * as winston from 'winston';
         new winston.transports.Console({
           format: winston.format.combine(
             winston.format.timestamp(),
-            winston.format.json(),
+            nestWinstonModuleUtilities.format.nestLike('Nest', {
+              colors: true,
+              prettyPrint: true,
+            }),
           ),
         }),
       ],
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        type: 'postgres',
+        host: config.get('DB_HOST'),
+        port: config.get<number>('DB_PORT'),
+        username: config.get('DB_USERNAME'),
+        password: config.get('DB_PASSWORD'),
+        database: config.get('DB_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: true,
+      }),
     }),
   ],
   controllers: [AppController],
