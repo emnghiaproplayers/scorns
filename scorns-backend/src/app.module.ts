@@ -9,6 +9,7 @@ import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-win
 import * as winston from 'winston';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
+import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { ConfigService } from '@nestjs/config';
         synchronize: true,
       }),
     }),
+    UserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
