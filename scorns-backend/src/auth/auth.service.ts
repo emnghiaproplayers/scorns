@@ -36,4 +36,23 @@ export class AuthService {
 
         return { accessToken, refreshToken };
     }
+
+    async refresh(userId: string, refreshToken: string) {
+        const user = await this.userRepo.findOne({ where: { id: userId } });
+        if (!user || !user.hashedRefreshToken) {
+            throw new UnauthorizedException();
+        }
+
+        const isMatch = await bcrypt.compare(refreshToken, user.hashedRefreshToken);
+        if (!isMatch) throw new UnauthorizedException();
+
+        const payload = { sub: user.id, email: user.email, role: user.role };
+        const newAccessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+        return { accessToken: newAccessToken };
+    }
+
+    async logout(userId: string) {
+        // Set hashedRefreshToken to null to revoke it
+        await this.userRepo.update(userId, { hashedRefreshToken: null });
+    }
 }

@@ -1,5 +1,7 @@
-import { Controller, Post, Body } from "@nestjs/common";
+import { Controller, Post, Body, UseGuards, Req } from "@nestjs/common";
 import { AuthService } from "./auth.service";
+import { AuthGuard } from "@nestjs/passport";
+import express from "express";
 
 @Controller('auth')
 export class AuthController {
@@ -13,5 +15,19 @@ export class AuthController {
     @Post('login')
     login(@Body() body: { email: string; password: string }) {
         return this.authService.login(body.email, body.password);
+    }
+
+    @UseGuards(AuthGuard('jwt-refresh'))
+    @Post('refresh')
+    refresh(@Req() req: any) {
+        const user = req['user'] as any;
+        return this.authService.refresh(user.sub, user.refreshToken);
+    }
+
+    @UseGuards(AuthGuard('jwt-refresh'))
+    @Post('logout')
+    logout(@Req() req: any) {
+        const user = req['user'] as any;
+        return this.authService.logout(user.sub);
     }
 }
