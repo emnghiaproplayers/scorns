@@ -35,6 +35,13 @@ import { ConfigService } from '@nestjs/config';
             }),
           ),
         }),
+        new winston.transports.File({
+          filename: 'logs/application.log',
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.json(),
+          ),
+        }),
       ],
     }),
     TypeOrmModule.forRootAsync({
