@@ -5,6 +5,8 @@ import { ConfigModule } from '@nestjs/config';
 import { plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { EnvironmentVariables } from './env.validation';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
 @Module({
   imports: [
@@ -19,6 +21,16 @@ import { EnvironmentVariables } from './env.validation';
         if (errors.length > 0) throw new Error(errors.toString());
         return validated;
       },
+    }),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            winston.format.json(),
+          ),
+        }),
+      ],
     }),
   ],
   controllers: [AppController],
