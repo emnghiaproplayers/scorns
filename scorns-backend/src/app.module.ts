@@ -10,6 +10,7 @@ import * as winston from 'winston';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { UserModule } from './users/user.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -59,6 +60,8 @@ import { UserModule } from './users/user.module';
       }),
     }),
     UserModule,
+    AuthModule,
+
   ],
   controllers: [AppController],
   providers: [AppService],
