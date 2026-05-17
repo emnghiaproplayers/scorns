@@ -1,4 +1,7 @@
-import { Controller, Post, Body, UseGuards, Req } from "@nestjs/common";
+import { Controller, Post, Body, UseGuards, Req, Get } from "@nestjs/common";
+import { JwtAuthGuard } from "./guards/jwt-auth.guard";
+import { RolesGuard } from "./guards/roles.guard";
+import { Roles } from "./decorators/roles.decorator";
 import { AuthService } from "./auth.service";
 import { AuthGuard } from "@nestjs/passport";
 import express from "express";
@@ -29,5 +32,18 @@ export class AuthController {
     logout(@Req() req: any) {
         const user = req['user'] as any;
         return this.authService.logout(user.sub);
+    }
+
+    @Get('profile')
+    @UseGuards(JwtAuthGuard)
+    getProfile(@Req() req: any) {
+        return req['user'];
+    }
+
+    @Post('admin/items')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('admin')
+    createItem(@Body() body: any) {
+        return { message: 'Item created successfully by Admin', data: body };
     }
 }
