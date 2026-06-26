@@ -1,20 +1,24 @@
+import { loadEnv } from './config/env';
+// fail fast BEFORE the server starts
+const env = loadEnv();
+
 import { NestFactory } from '@nestjs/core';
-import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
-import { Logger } from '@nestjs/common';
+import { PinoLogger } from './pino-logger.service';
+import { requestId } from './request-id.middleware';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  const configService = app.get(ConfigService);
-  const port = configService.get<number>('PORT', 3000);
+  const pinoLogger = new PinoLogger();
+  const app = await NestFactory.create(AppModule, {
+    logger: pinoLogger,
+  });
 
-  app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
-  
-  const logger = new Logger('Bootstrap');
-  logger.log('PostgreSQL Database connected successfully!');
+  app.enableShutdownHooks(); // run onModuleDestroy on SIGTERM/SIGINT
+  app.use(requestId);
 
-  await app.listen(port);
-  logger.log(`Application running on port ${port}`);
+  pinoLogger.log('PostgreSQL Database connected successfully!', 'Bootstrap');
+
+  await app.listen(env.PORT);
+  pinoLogger.log(`Application running on port ${env.PORT}`, 'Bootstrap');
 }
 bootstrap();
