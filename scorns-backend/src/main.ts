@@ -9,16 +9,21 @@ import { requestId } from './request-id.middleware';
 
 async function bootstrap() {
   const pinoLogger = new PinoLogger();
-  const app = await NestFactory.create(AppModule, {
-    logger: pinoLogger,
-  });
+  try {
+    const app = await NestFactory.create(AppModule, {
+      logger: pinoLogger,
+    });
 
-  app.enableShutdownHooks(); // run onModuleDestroy on SIGTERM/SIGINT
-  app.use(requestId);
+    app.enableShutdownHooks(); // run onModuleDestroy on SIGTERM/SIGINT
+    app.use(requestId);
 
-  pinoLogger.log('PostgreSQL Database connected successfully!', 'Bootstrap');
+    pinoLogger.log('PostgreSQL Database connected successfully!', 'Bootstrap');
 
-  await app.listen(env.PORT);
-  pinoLogger.log(`Application running on port ${env.PORT}`, 'Bootstrap');
+    await app.listen(env.PORT);
+    pinoLogger.log(`Application running on port ${env.PORT}`, 'Bootstrap');
+  } catch (error) {
+    pinoLogger.error(`Bootstrap failed: ${error}`, 'Bootstrap');
+    process.exit(1);
+  }
 }
 bootstrap();
