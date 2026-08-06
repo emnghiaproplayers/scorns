@@ -10,15 +10,15 @@
 
 ```
 [ HTTP / Presentation Layer ]
-  └─ HealthController (src/http/health.controller.ts)
+  └─ HealthController (scorns-backend/src/http/health.controller.ts)
         │
         ▼  (gọi Domain Service)
 [ Domain / Business Layer ]
-  └─ HealthService (src/domain/health.service.ts)
+  └─ HealthService (scorns-backend/src/domain/health.service.ts)
         │
         ▼  (gọi Data Repository)
 [ Data / Infrastructure Layer ]
-  └─ DbRepository (src/data/db.repository.ts)
+  └─ DbRepository (scorns-backend/src/data/db.repository.ts)
 ```
 
 ### Quy tắc Độc lập Lớp (Layer Separation Rules):
@@ -163,7 +163,7 @@ bootstrap();
 
 ## ⚙️ 3. Cấu Hình Môi Trường (.env & Validation)
 
-Hệ thống đọc biến môi trường qua Zod Schema (`src/config/env.schema.ts`):
+Hệ thống đọc biến môi trường qua Zod Schema (`scorns-backend/src/config/env.schema.ts`):
 
 ```env
 PORT=3000
@@ -248,7 +248,7 @@ Connection: keep-alive
 
 **Lệnh thực thi Unit Tests:**
 ```bash
-npm test
+cd scorns-backend && npm test
 ```
 
 **Terminal Output Kiểm Thử Thực Tế:**
